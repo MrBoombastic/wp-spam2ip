@@ -129,12 +129,17 @@ function spam2ip_process()
                 $user_agent = 'Unknown';
             }
 
+            // "Sanitization" - for fucks sake, how to do this properly?
+            $comment_content = strip_tags($comment->comment_content);
+            $comment_content = str_replace(["\r\n", "\r", "\n"], " ", $comment_content);
+            $comment_content = preg_replace('/[\x00-\x1F\x7F]/', '', $comment_content);
+
             $ip_data[] = array(
                     'ip' => $ip,
                     'author' => sanitize_text_field($comment->comment_author),
                     'email' => sanitize_email($comment->comment_author_email),
                     'date' => $comment->comment_date,
-                    'content' => strip_tags($comment->comment_content),
+                    'content' => sanitize_text_field($comment_content),
                     'user_agent' => sanitize_text_field($user_agent)
             );
         }
