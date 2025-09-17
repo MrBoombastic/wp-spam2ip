@@ -2,7 +2,7 @@
 /**
  * Plugin Name:          Spam2IP
  * Description:          Export spam comments to a file, extract IPs
- * Version:              1.0.1
+ * Version:              1.1.0
  * Author:               MrBoombastic
  * License:              MIT
  * Requires at least:    6.7.1
@@ -71,6 +71,12 @@ function spam2ip_page()
                         <label>
                             <input type="radio" name="format" value="csv">
                             CSV format (IP, Author, Email, Date, Content, User-Agent)
+                        </label>
+                    </p>
+                    <p>
+                        <label>
+                            <input type="radio" name="format" value="abuseipdb">
+                            AbuseIPDB CSV (bulk report)
                         </label>
                     </p>
                     <p>
@@ -166,10 +172,42 @@ function spam2ip_process()
         $filename .= '_' . date('Y-m-d');
     }
 
-    $filename .= '.' . $format;
+    if ($format === 'abuseipdb') {
+        $filename .= '_abuseipdb.csv';
+    } else {
+        $filename .= '.' . $format;
+    }
 
     if (ob_get_level()) {
         ob_clean();
+    }
+
+    if ($format === 'abuseipdb') {
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        echo "IP,Categories,Comment,ReportDate\n";
+        $ip_earliest = array();
+        foreach ($ip_data as $data) {
+            $ip = $data['ip'];
+            if (!isset($ip_earliest[$ip]) || strtotime($data['date']) < strtotime($ip_earliest[$ip]['date'])) {
+                $ip_earliest[$ip] = $data;
+            }
+        }
+        foreach ($ip_earliest as $data) {
+            $escaped_ip = '"' . str_replace('"', '""', $data['ip']) . '"';
+            $category = '12';
+            $comment = 'WordPress comment spam. Reported by Spam2IP: https://github.com/MrBoombastic/wp-spam2ip';
+            $escaped_comment = '"' . str_replace('"', '""', $comment) . '"';
+            $wp_timezone = wp_timezone();
+            $dt = date_create($data['date'], $wp_timezone);
+            $iso_date = $dt->format('c');
+            $escaped_date = '"' . str_replace('"', '""', $iso_date) . '"';
+            echo $escaped_ip . ',' . $category . ',' . $escaped_comment . ',' . $escaped_date . "\n";
+        }
+        exit;
     }
 
     header('Content-Type: text/plain; charset=utf-8');

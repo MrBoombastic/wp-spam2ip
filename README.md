@@ -19,6 +19,7 @@ author, email, date, content, and User-Agent).
 - 📊 Export in TXT and CSV formats
 - 📅 Add date to filename
 - 📱 WordPress dashboard widget showing spam count
+- 🤖 Generate ready to use AbuseIPDB bulk report CSV file
 
 ## 🔧 Requirements
 
