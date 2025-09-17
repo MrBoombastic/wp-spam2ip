@@ -2,7 +2,7 @@
 /**
  * Plugin Name:          Spam2IP
  * Description:          Export spam comments to a file, extract IPs
- * Version:              1.0.0
+ * Version:              1.0.1
  * Author:               MrBoombastic
  * License:              MIT
  * Requires at least:    6.7.1
@@ -17,7 +17,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-const SPAM2IP_VERSION = '1.0.0';
 define('SPAM2IP_PATH', plugin_dir_path(__FILE__));
 define('SPAM2IP_URL', plugin_dir_url(__FILE__));
 
